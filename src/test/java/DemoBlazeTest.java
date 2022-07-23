@@ -228,7 +228,7 @@ public class DemoBlazeTest {
 
 
 
-    //Verify that the contents added to the cart are saved against the user login details
+    //Verify that the contents added of the cart are saved against the user login details even after logout
     public static Boolean TestCase07() throws InterruptedException {
         logStatus("Start TestCase", "Test Case 7: Verify that the contents added to the cart are saved against the user login details", "DONE");
         status = false;
@@ -294,7 +294,7 @@ public class DemoBlazeTest {
         return status;
     }
 
-    //View the list of Products under each Category
+    //View the list of Products under a category
     public static Boolean TestCase08() throws InterruptedException {
         logStatus("Start TestCase", "Test Case 8: View the list of Products under each Category ", "DONE");
         String category="";
@@ -303,14 +303,54 @@ public class DemoBlazeTest {
         Home home = new Home(driver);
         home.navigateToHomePage();
 
-        List<WebElement> elements = driver.findElements(By.xpath("//a[@id='itemc']"));
-        for(WebElement categoryElement : elements){
-            category = categoryElement.getText();
+        List<WebElement> item = driver.findElements(By.xpath("//a[@id='itemc']"));
+        for(WebElement webElement : item){
+            category = webElement.getText();
             home.listOfProducts(category);
         }
 
-        logStatus("End TestCase", "Test Case 8: View the list of Products under each Category ", status ? "PASS" : "FAIL");
+        logStatus("End TestCase", "Test Case 8: View the list of Products under each Category ", "PASS");
         return true;
+    }
+
+    //Verify products should not be added by user without login
+    public static Boolean TestCase09() throws InterruptedException {
+        logStatus("Start TestCase", "Test Case 9: Verify products should not be added by user without login ", "DONE");
+
+        //HomePage(Product to View)
+        String category = "Monitors";
+        String product = "Apple monitor";
+        Home home = new Home(driver);
+        home.navigateToHomePage();
+        status = home.searchForProduct(category, product);
+        logStatus("TestCase 9", "Test Step: Verify searching for a Product: "+ product, status ? "PASS" : "FAIL");
+
+        //Product page
+        status = home.addProductToCart();
+        logStatus("TestCase 9", "Test Step: Verify Product added to cart: "+ product, status ? "PASS" : "FAIL");
+
+        //Cart(Product in cart)
+        String expectedResult = product;
+        Cart cart = new Cart(driver);
+        cart.navigateToCart();
+        cart.verifyCart(expectedResult);
+
+        //Checkout(PlaceOrder)
+        String name = "Amandeep Singh";
+        String country = "India";
+        String city = "Kolkata";
+        String cardDetails = "XXXX-XXXX-XXXX-2RTY";
+        String month = "12";
+        String year = "2022";
+
+        CheckOut checkout = new CheckOut(driver);
+        checkout.navigateToCart();
+        status = checkout.placeOrder(name, country, city, cardDetails, month, year);
+        logStatus("TestCase 9", "Test Step: Verify order placed: "+ product, status ? "PASS" : "FAIL");
+
+        //If status is pass here, it means the testcase failed
+        logStatus("End TestCase", "Test Case 9: Verify Happy Flow of buying a product ", status ? "PASS" : "FAIL");
+        return status;
     }
 
     public static void main(String[] args) {
@@ -373,6 +413,13 @@ public class DemoBlazeTest {
 
             totalTests += 1;
             status = TestCase08();
+            if (status) {
+                passedTests += 1;
+            }
+            System.out.println(" ");
+
+            totalTests += 1;
+            status = TestCase09();
             if (status) {
                 passedTests += 1;
             }

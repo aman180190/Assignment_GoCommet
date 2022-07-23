@@ -30,7 +30,7 @@ public class Home {
         //Traversing the loop to find the category
         for(WebElement sub_category : categories){
             if(sub_category.getText().trim().equalsIgnoreCase(Category)){
-                System.out.println(Category +" :category is present");
+                System.out.println("Category: " + Category);
                 sub_category.click();
             }
         }
@@ -99,10 +99,14 @@ public class Home {
             if (sub_category.getText().trim().equalsIgnoreCase(Category)) {
                 System.out.println("Category: " + sub_category.getText());
                 sub_category.click();
+                break;
             }
         }
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".hrefch")));
+        synchronized (wait){
+            wait.wait(3000);
+        }
+
         //It holds the list of products under each category present in the homepage
         List<WebElement> products = this.driver.findElements(By.cssSelector(".hrefch"));
 
@@ -112,9 +116,8 @@ public class Home {
             System.out.println(desired_product.getText());
         }
         System.out.println();
-        synchronized (driver){
-            driver.wait(4000);
-        }
-        navigateToHomePage();
     }
 }
+
+
+
